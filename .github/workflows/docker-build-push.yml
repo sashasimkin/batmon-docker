@@ -1,0 +1,64 @@
+name: Docker Build and Push to GHCR
+
+on:
+  schedule:
+    # Run everyday at 2:00 AM or adjust as per your release schedule
+    - cron: "0 2 * * *"
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/batmon-ha
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clone fl4p/batmon-ha
+        run: |
+          git clone https://github.com/fl4p/batmon-ha.git repo-batmon-ha
+          cd repo-batmon-ha
+          # Change the first line in run.sh to #!/bin/sh as per issue comment #1400900525
+          sed -i '1s|.*|#!/bin/sh|' run.sh
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./repo-batmon-ha
+          file: ./repo-batmon-ha/Dockerfile
+          build-args: |
+            BUILD_FROM=alpine
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Automatic Tagging
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: machulav/git-tag-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
