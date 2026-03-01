@@ -26,6 +26,10 @@ jobs:
           repository: fl4p/batmon-ha
           path: batmon-ha
 
+      - name: Patch addon_main.sh shebang
+        run: |
+          sed -i '1s|.*|#!/bin/sh|' batmon-ha/addon_main.sh
+
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
