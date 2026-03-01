@@ -1,0 +1,47 @@
+image:
+  repository: ghcr.io/sashasimkin/batmon-ha
+  tag: latest
+  pullPolicy: Always
+
+# batmon-ha options.json config — passed as /data/options.json inside the container.
+# See https://github.com/fl4p/batmon-ha for available options.
+# Example:
+# config:
+#   devices:
+#     - address: "AA:BB:CC:DD:EE:FF"
+#       type: jk
+#       alias: my_bms
+#   mqtt_host: "mosquitto.home-media.svc.cluster.local"
+#   mqtt_port: 1883
+#   mqtt_user: ""
+#   mqtt_password: ""
+#   period: 1.0
+config: {}
+
+# Resource requests/limits
+resources: {}
+#  requests:
+#    cpu: 100m
+#    memory: 64Mi
+#  limits:
+#    memory: 128Mi
+
+# Node affinity — pin to the node with Bluetooth hardware
+nodeSelector: {}
+# kubernetes.io/hostname: orange-pi
+
+tolerations: []
+
+affinity: {}
+
+hostNetwork: false
+
+# Bluetooth device access via host PID namespace
+hostPID: false
+
+# Extra env vars
+env: []
+
+# Extra volumes/mounts (e.g. for Bluetooth socket)
+extraVolumes: []
+extraVolumeMounts: []
