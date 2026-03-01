@@ -37,7 +37,7 @@ affinity: {}
 hostNetwork: false
 
 # Bluetooth device access via host PID namespace
-hostPID: false
+hostPID: true
 
 # Extra env vars
 env: []
