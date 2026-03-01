@@ -43,5 +43,12 @@ hostPID: false
 env: []
 
 # Extra volumes/mounts (e.g. for Bluetooth socket)
-extraVolumes: []
-extraVolumeMounts: []
+extraVolumes:
+  - name: dbus
+    hostPath:
+      path: /run/dbus
+      type: Directory
+extraVolumeMounts:
+  - name: dbus
+    mountPath: /run/dbus
+    readOnly: true
